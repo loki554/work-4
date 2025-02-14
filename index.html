@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Форма с jQWidgets</title>
+    <link rel="stylesheet" href="https://jqwidgets.com/public/jqwidgets/styles/jqx.base.css">
+    <link rel="stylesheet" href="https://jqwidgets.com/public/jqwidgets/styles/jqx.energyblue.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://jqwidgets.com/public/jqwidgets/jqx-all.js"></script>
+    <style>
+        td {
+            padding-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="tabs">
+        <ul>
+            <li>Атрибуты</li>
+        </ul>
+        <div>
+            <table style="padding: 5px; width: 100%;">
+                <tr style="height: 25px; vertical-align:bottom;">
+                    <td colspan="2">Наименование:</td>
+                    <td>Номер:</td>
+                    <td>Год:</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><input type="text" id="name" readonly></td>
+                    <td><input type="text" id="number" readonly></td>
+                    <td><input type="text" id="year" readonly></td>
+                </tr>
+                <tr style="height: 35px; vertical-align:bottom;">
+                    <td>Дата с:</td>
+                    <td>Дата по:</td>
+                    <td>Состояние:</td>
+                </tr>
+                <tr>
+                    <td><div id="dateFrom"></div></td>
+                    <td><div id="dateTo"></div></td>
+                    <td><input type="text" id="status" readonly></td>
+                    <td>
+                        <span>Объект закрыт</span>
+                        <input type="checkbox" id="closed">
+                    </td>
+                </tr>
+                <tr style="height: 35px; vertical-align:bottom;">
+                    <td>Тип хранения:</td>
+                    <td>Формат хранения:</td>
+                    <td>Группа:</td>
+                </tr>
+                <tr>
+                    <td><div id="storageType"></div></td>
+                    <td><div id="storageFormat"></div></td>
+                    <td><input type="text" id="group" readonly></td>
+                </tr>
+                <tr style="height: 45px; vertical-align:bottom;">
+                    <td>Количество документов план:</td>
+                    <td>Количество документов факт:</td>
+                    <td>Количество листов план:</td>
+                    <td>Количество листов факт:</td>
+                </tr>
+                <tr>
+                    <td><input type="text" id="docPlan" readonly></td>
+                    <td><input type="text" id="docFact" readonly></td>
+                    <td><input type="text" id="sheetsPlan" readonly></td>
+                    <td><input type="text" id="sheetsFact" readonly></td>
+                </tr>
+                <tr style="height: 35px; vertical-align:bottom;">
+                    <td>Комментарий:</td>
+                </tr>
+                <tr>
+                    <td colspan="3"><textarea id="comments"></textarea></td>
+                </tr>
+                <tr style="height: 50px; vertical-align: bottom;">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        <button id="update">Обновить</button>
+                        <button id="cancel">Отменить</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let obj = {
+                nodeId: 4000021,
+                volumeName: "Папка 11",
+                volumeNum: "11",
+                year: "2021",
+                dateFrom: "01.07.2021",
+                dateTo: null,
+                volumeClosed: "0",
+                storageType: "Библиотечный",
+                locatorType: "Книжная полка 75",
+                sheetsPlan: "75",
+                sheetsFact: null,
+                docsPlan: null,
+                docsFact: null,
+                comment: null
+            };
+
+            let storageTypes = [
+                { text: "Библиотечный", value: "1" },
+                { text: "Электронный", value: "2" }
+            ];
+
+            let storageFormats = [
+                { text: "Книжный шкаф 400", value: "1", quantity: "400" },
+                { text: "Книжный шкаф 350", value: "2", quantity: "350" },
+                { text: "ЭЛЕКТРОННАЯ ПОЛКА", value: "3", quantity: "25" },
+                { text: "Книжная полка 75", value: "4", quantity: "75" },
+                { text: "Книжная полка 50", value: "5", quantity: "50" },
+                { text: "Книжная полка 150", value: "6", quantity: "150" }
+            ];
+
+            $("#tabs").jqxTabs({ width: '900px' });
+            $("#name, #number, #year, #docPlan, #docFact, #sheetsPlan, #sheetsFact, #status").jqxInput({ width: '100%', height: '25px' });
+            $("#dateFrom, #dateTo").jqxDateTimeInput({ width: '100%', height: '25px', showCalendarButton: true, disabled: true});
+            
+            $("#storageType").jqxDropDownList({
+                source: storageTypes.map(s => s.text),
+                autoDropDownHeight: true,
+                width: '100%',
+                height: '25px'
+            });
+
+            $("#storageFormat").jqxDropDownList({
+                source: storageFormats.map(f => f.text),
+                autoDropDownHeight: true,
+                width: '100%',
+                height: '25px'
+            });
+
+            $("#closed").jqxCheckBox({ width: '25px', height: '25px' });
+            $("#comments").jqxTextArea({ width: '100%', height: '100px' });
+            $("#update, #cancel").jqxButton({ width: '47%', height: '25px' });
+
+            $("#group").jqxInput({ width: '100%', height: '25px', disabled: true });
+
+            function loadFormData() {
+                $("#name").val(obj.volumeName);
+                $("#number").val(obj.volumeNum);
+                $("#year").val(obj.year);
+                $("#status").val(obj.volumeClosed === "1" ? "Закрыт" : "Открыт");
+                $("#closed").jqxCheckBox('val', obj.volumeClosed === "1");
+                if (obj.volumeClosed === "1") {
+                    $("#status").val("Закрыт");
+                    $("#dateTo").jqxDateTimeInput('setDate', new Date());
+                } else {
+                    $("#status").val("Открыт");
+                    $("#dateTo").jqxDateTimeInput('setDate', null);
+                }
+                $("#docsFact").val(obj.docsFact);
+                $("#docsPlan").val(obj.docsPlan);
+                $("#sheetsPlan").val(obj.sheetsPlan);
+                $("#sheetsFact").val(obj.sheetsFact);
+                $("#comments").val(obj.comment || "");
+                $("#dateFrom").jqxDateTimeInput('setDate', new Date(obj.dateFrom));
+                $("#storageType").jqxDropDownList('selectIndex', storageTypes.findIndex(t => t.text === obj.storageType));
+                $("#storageFormat").jqxDropDownList('selectIndex', storageFormats.findIndex(f => f.text === obj.locatorType));
+                $("#group").val(obj.storageType);
+
+                updateFieldAccessibility();
+            }
+
+            function updateFieldAccessibility() {
+                let isClosed = $("#closed").jqxCheckBox('checked');
+                $("#storageType").jqxDropDownList({ disabled: isClosed });
+                $("#storageFormat").jqxDropDownList({ disabled: isClosed });
+                $("#group").val($("#storageType").jqxDropDownList('getSelectedItem').label);
+
+                if (isClosed) {
+                    $("#status").val("Закрыт");
+                    $("#dateTo").jqxDateTimeInput('setDate', new Date());
+                } else {
+                    $("#status").val("Открыт");
+                    $("#dateTo").jqxDateTimeInput('setDate', null);
+                }
+            }
+
+            $("#closed").on('change', function () {
+                updateFieldAccessibility();
+            });
+
+            $("#storageType").on('select', function (event) {
+                let item = event.args.item;
+                if (item) {
+                    $("#group").val(item.label);
+                }
+            });
+
+            $("#update").on("click", function () {
+                obj.comment = $("#comments").val();
+                obj.volumeClosed = $("#closed").jqxCheckBox('checked') ? "1" : "0";
+                obj.storageType = storageTypes[$("#storageType").jqxDropDownList('selectedIndex')].text;
+                obj.locatorType = storageFormats[$("#storageFormat").jqxDropDownList('selectedIndex')].text;
+                obj.sheetsPlan = $("#sheetsPlan").val();
+                obj.docsPlan = $("#docPlan").val();
+                obj.docsFact = $("#docFact").val();
+                obj.sheetsFact = $("#sheetsFact").val();
+                obj.dateFrom = $("#dateFrom").jqxDateTimeInput('getDate') ? $("#dateFrom").jqxDateTimeInput('getDate').toLocaleDateString() : null;
+                obj.dateTo = $("#dateTo").jqxDateTimeInput('getDate') ? $("#dateTo").jqxDateTimeInput('getDate').toLocaleDateString() : null;
+
+                console.log("Обновленный объект:", obj);
+            });
+            $("#cancel").on("click", function () {
+                loadFormData();
+            });
+            loadFormData();
+        });
+    </script>
+</body>
+</html>
